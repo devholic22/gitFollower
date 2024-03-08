@@ -13,11 +13,9 @@ import java.util.List;
 @Component
 public class GithubManagerImpl implements GithubManager {
 
-    private GitHub gitHub;
-
     @Override
     public List<String> findFollowers(final String token, final String username) {
-        validateToken(token);
+        GitHub gitHub = createGitHubFromToken(token);
 
         try {
             GHUser user = gitHub.getUser(username);
@@ -29,12 +27,14 @@ public class GithubManagerImpl implements GithubManager {
         }
     }
 
-    private void validateToken(final String token) {
+    private GitHub createGitHubFromToken(final String token) {
         try {
-            gitHub = new GitHubBuilder()
+            GitHub gitHub = new GitHubBuilder()
                     .withOAuthToken(token)
                     .build();
             gitHub.checkApiUrlValidity();
+
+            return gitHub;
         } catch (IOException exception) {
             throw new GithubTokenException();
         }
